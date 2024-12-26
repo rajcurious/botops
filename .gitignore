@@ -1,0 +1,8 @@
+# dependencies
+/node_modules
+
+# local dev files
+test-db.js
+test-sqlitedb.js
+
+.env*
