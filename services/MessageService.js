@@ -1,8 +1,5 @@
 // Service using UserRepository
 
-const dotenv  = require("dotenv");
-const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.dev';
-dotenv.config({ path: envFile });
 const UniqueIDGenerator = require("../utils/uniqueIdentity");
 
 

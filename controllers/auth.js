@@ -2,12 +2,8 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const dotenv =  require("dotenv")
 
 const router = express.Router()
-
-const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.dev';
-dotenv.config({ path: envFile });
 
 const JWT_SECRET = process.env.JWT_SECRET; 
 const users = []; // Mock database (replace with real DB in production)

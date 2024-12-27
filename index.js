@@ -1,5 +1,4 @@
 const express  =  require("express");
-const dotenv =  require("dotenv")
 const authRoutes = require("./Routes/authRoutes")
 const messageRoutes = require("./Routes/messageRoutes")
 const userRoutes = require("./Routes/userRoutes")
@@ -17,8 +16,6 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy
 const cors =  require('cors');  
 const { userService } = require("./dependencies");
 
-const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.dev';
-dotenv.config({ path: envFile });
 
 const authenticateJWT = (req, res, next) => {
     if (publicRoutes.includes(req.path)) return next();
@@ -61,7 +58,7 @@ app.use(passport.initialize());
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret : process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: `${process.env.SERVER_DOMAIN}:${process.env.PORT}/auth/google/callback`,
+  callbackURL: `${process.env.SERVER_DOMAIN}/api/auth/google/callback`,
   scope: ['email','profile','openid'],
 },
  async (accessToken, refreshToken, profile, done) =>{

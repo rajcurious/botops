@@ -12,7 +12,7 @@ Router.get(
   "/google/callback",
   passport.authenticate("google", {
     session: false,
-    failureRedirect: "/auth/google/signin",
+    failureRedirect: "/api/auth/google/signin",
   }),
   (req, res) => {
     // Generate JWT token
