@@ -79,6 +79,7 @@ const io = new Server(server, {
   cors: {
     origin: (origin, callback) => {
       const allowedOrigins = [`${process.env.FRONT_END_DOMAIN}`];
+      return callback(null, true);
       if (allowedOrigins.includes(origin) || !origin) {
         callback(null, true);
       } else {
