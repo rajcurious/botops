@@ -10,6 +10,7 @@ const dotenv =  require('dotenv')
 
 const envFile = process.env.NODE_ENV === 'production' ? '../.env.production' : '../.env.dev';
 dotenv.config({ path: envFile });
+console.log("env variable", process.env.NODE_ENV," " ,  process.env.SQLITE_DB_PATH);
 
 
 class RepositoryFactory {
