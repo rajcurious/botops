@@ -1,4 +1,4 @@
-const repositoryFactory = require("./respositories/RepositoryFactory");
+const repositoryFactory = require("./repositories/RepositoryFactory");
 const MessageService = require("./services/MessageService");
 const UserService = require("./services/UserService");
 const NotificationService = require("./services/NotificationService");
