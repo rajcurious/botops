@@ -58,7 +58,7 @@ app.use(passport.initialize());
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret : process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: `${process.env.SERVER_DOMAIN}/api/auth/google/callback`,
+  callbackURL: `${process.env.SERVER_DOMAIN}/auth/google/callback`,
   scope: ['email','profile','openid'],
 },
  async (accessToken, refreshToken, profile, done) =>{
