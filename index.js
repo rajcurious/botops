@@ -98,14 +98,14 @@ app.use(express.json());
 
 
 //Routes
-app.use('/auth', authRoutes);
-app.use('/message/', messageRoutes);
-app.use('/user/', userRoutes);
-app.use('/startup/', startUpRoutes);
-app.use('/channel/', channelRoutes);
-app.use('/friend-request/', friendRequestRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/message/', messageRoutes);
+app.use('/api/user/', userRoutes);
+app.use('/api/startup/', startUpRoutes);
+app.use('/api/channel/', channelRoutes);
+app.use('/api/friend-request/', friendRequestRoutes);
 
-app.get("/", (req, res)=>{
+app.get("/api/", (req, res)=>{
     console.log(req.user)
     res.send("API is  running")
 });
