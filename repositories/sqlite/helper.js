@@ -1,8 +1,8 @@
 
  // Helper to run a single query (INSERT, UPDATE, DELETE)
 function runQuery(db, query, params = []) {
-    console.log("Query: ", query)
-    console.log("Params ",  params)
+    // console.log("Query: ", query)
+    // console.log("Params ",  params)
     return new Promise((resolve, reject) => {
         db.run(query, params, function (err) {
             if (err) {
@@ -16,9 +16,9 @@ function runQuery(db, query, params = []) {
 
  // Helper to fetch multiple rows (SELECT)
 function allQuery(db, query, params = []) {
-    console.log("Query: ", query)
+    // console.log("Query: ", query)
     params = params.map((param)=>param.toString())
-    console.log("Params ",  params)
+    // console.log("Params ",  params)
     return new Promise((resolve, reject) => {
         db.all(query, params, (err, rows) => {
             if (err) {

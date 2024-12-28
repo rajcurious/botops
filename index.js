@@ -26,7 +26,6 @@ const authenticateJWT = (req, res, next) => {
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
       if (err) return res.status(403).json({ message: 'Forbidden' });
       req.user = user; // Attach user to the request object
-      console.log(user)
       next();
     });
   };
@@ -38,7 +37,6 @@ const app  = express();
 // CORS configuration
 app.use(cors({
   origin: (origin, callback) => {
-    console.log(origin)
     const allowedOrigins = [`${process.env.FRONT_END_DOMAIN}`];
     if (allowedOrigins.includes(origin) || !origin) {
       callback(null, true);
@@ -104,7 +102,6 @@ app.use('/channel/', channelRoutes);
 app.use('/friend-request/', friendRequestRoutes);
 
 app.get("/", (req, res)=>{
-    console.log(req.user)
     res.send("API is  running")
 });
 

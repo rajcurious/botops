@@ -5,7 +5,6 @@ const { getOne } = require("../utils/helper")
 const startUpData =  async (req, res) => {
 
     const user = req.user;
-    console.log(user);
     const channel_subscriptions = await userService.getChannelsSubscribedBy(user.id);
     const channel_ids = []
     channel_subscriptions.forEach(subscription => {

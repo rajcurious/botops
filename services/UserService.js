@@ -120,7 +120,6 @@ class UserService {
     }
 
     async getChannelsSubscribedBy(user_id) {
-        console.log("getChannelsSubscribedBy", user_id)
         if(!user_id) {
             throw Error("Field user_id  is null, id  is must be not null to get channel subscriptions") 
         }

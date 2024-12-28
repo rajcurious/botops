@@ -25,7 +25,6 @@ function setupSocket(io) {
     const user = getOne(await userService.searchUser({id: userId}))
     if(user.bot){
        const channelSubsriptions =  await userService.getChannelsSubscribedBy(BigInt(userId))
-       console.log(channelSubsriptions);
        channelSubsriptions.forEach((subscription) => {
         const channel = connectionManager.getOrCreateChannel(subscription?.channel_id)
         channel.addSocket(socket);
@@ -51,7 +50,6 @@ function setupSocket(io) {
       const user = getOne(await userService.searchUser({id: userId}))
       if(user.bot){
          const channelSubsriptions =  await userService.getChannelsSubscribedBy(BigInt(userId))
-         console.log(channelSubsriptions);
          channelSubsriptions.forEach((subscription) => {
           const channel = connectionManager.getOrCreateChannel(subscription?.channel_id)
           channel.addSocket(socket);
@@ -75,7 +73,6 @@ function setupSocket(io) {
     });
 
     socket.on("add-friend", async ({friend_request_id, from_user, to_user}) => {
-       console.log('socket-id', socket.id)
        const to_user_id = to_user.id.toString()
       
         if(users.get(to_user_id)) {
@@ -87,8 +84,6 @@ function setupSocket(io) {
     })
 
     socket.on("friend-request-update", async ({status, payload}) => {
-      console.log(status)
-      console.log('socket-id', socket.id)
       
       if(status === 'ACCEPTED') {
           const {friend_request_id, channel_id, notification_id} = payload

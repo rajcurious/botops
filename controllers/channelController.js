@@ -15,7 +15,6 @@ const updateChannel = async (req, res) => {
 // const getChannel =  async (req, res) => {
 
 //     const response = await channelService.getChannelWithIds(req.query)
-//     console.log(response)
 //     res.status(200).send(response)
 // }
 

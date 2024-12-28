@@ -8,13 +8,11 @@ const {
 
 const createFriendRequest = async (req, res) => {
   const response = await friendRequestService.createFriendRequest(req.body);
-  console.log(response)
   res.status(200).send(response);
 };
 
 const updateFriendRequest = async (req, res) => {
   const { id} = req.body;
-  console.log(id)
   console.log("updateFriendRequest", req.body)
  
   const friendRequest = (await friendRequestService.searchFriendRequest({ id }))[0];
@@ -26,7 +24,6 @@ const updateFriendRequest = async (req, res) => {
     return null;
   }
   const response = await friendRequestService.updateFriendRequest(req.body);
-  console.log(response)
   if (req.body.fields?.status === "ACCEPTED") {
    
     const channel = await channelService.createChannel({
@@ -37,13 +34,11 @@ const updateFriendRequest = async (req, res) => {
     // TODO: Improve this api to a single call 
     await userService.subscribeUserToChannel(friendRequest.sender_id, channel.id)
     await userService.subscribeUserToChannel(friendRequest.receiver_id, channel.id)
-    console.log(channel)
     const notification = await notificationService.createNotification({
       receiver_id: friendRequest?.sender_id,
       type: "friend_request_update",
       message: `${sender.user_name} has accepted friend request.`,
     });
-    console.log(notification)
     res
       .status(200)
       .send({
@@ -62,7 +57,6 @@ const getFriendRequest =  async (req, res) =>  {
 // const getChannel =  async (req, res) => {
 
 //     const response = await channelService.getChannelWithIds(req.query)
-//     console.log(response)
 //     res.status(200).send(response)
 // }
 

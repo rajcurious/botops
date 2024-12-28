@@ -9,7 +9,6 @@ const getMessages = async (req, res) => {
         const userSet = new Set()
         for (const message of messages){
             const reactions = await messageService.getReactions(message.id)
-            console.log(reactions)
             message.reactions =  reactions;
         }
         messages.forEach((message) => userSet
@@ -53,9 +52,7 @@ const addMessage =  async (req, res) => {
 const getMessage =  async (req, res) => {
 
     const {id} =req.query
-    console.log(id)
     const response = await messageService.getMessageWithId(id)
-    console.log(response)
     res.status(200).send(response)
 
 }

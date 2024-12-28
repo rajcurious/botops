@@ -10,7 +10,6 @@ const users = []; // Mock database (replace with real DB in production)
 
 // Helper to generate a JWT
 const generateToken = (user) => {
-  console.log(JWT_SECRET)
   return jwt.sign({ username: user.username }, JWT_SECRET, { expiresIn: '1h' });
 };
 
@@ -33,7 +32,6 @@ const signUpController = async (req, res) => {
   
     // Save the user
     users.push({ username, password: hashedPassword });
-    console.log(users)
   
     return res.send('User registered successfully!');
   };
@@ -48,7 +46,6 @@ const loginController =  async (req, res) => {
   
     // Find the user
     const user = users.find((user) => user.username === username);
-    console.log(user)
     if (!user) {
       return res.status(400).send('Invalid username or password.');
     }
