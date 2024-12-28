@@ -24,16 +24,14 @@ class UniqueIDGenerator {
       }
   
       this.lastTimestamp = currentTimestamp;
+      
+      return currentTimestamp
+      
+      // const id = (BigInt(currentTimestamp) << 22n) | // Timestamp (41 bits)
+      // (BigInt(this.serverId) << 13n) | // Server ID (9 bits)
+      //  BigInt(this.sequence); // Sequence (13 bits)
 
-
-      if(this.dev) {
-        return currentTimestamp
-      }
-      id = (BigInt(currentTimestamp) << 22n) | // Timestamp (41 bits)
-      (BigInt(this.serverId) << 13n) | // Server ID (9 bits)
-       BigInt(this.sequence); // Sequence (13 bits)
-
-      return id;
+      // return id;
     }
   }
 
