@@ -19,7 +19,7 @@ Router.get(
     const {id, email, name, pfp_url, user_name, provider} = req.user;
     const token = jwt.sign({id, email, name, pfp_url, user_name, provider}, process.env.JWT_SECRET, { expiresIn: '1h' });
     // Set the token as a cookie
-    res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'strict' });
+    res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'strict', maxAge:9000000 });
     res.redirect(`${process.env.FRONT_END_DOMAIN}/app/welcome`);
   }
 );
