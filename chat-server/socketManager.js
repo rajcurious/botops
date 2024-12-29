@@ -23,6 +23,10 @@ function setupSocket(io) {
     
     // If user is bot already join this bot to the channels so..
     const user = getOne(await userService.searchUser({id: userId}))
+    if(!user){
+      console.log(`user with id ${userId} is not present`)
+      return
+    }
     if(user.bot){
        const channelSubsriptions =  await userService.getChannelsSubscribedBy(BigInt(userId))
        channelSubsriptions.forEach((subscription) => {
