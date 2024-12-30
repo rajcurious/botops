@@ -16,10 +16,11 @@ Router.get(
   }),
   (req, res) => {
     // Generate JWT token
+    console.log("we reacher here...")
     const {id, email, name, pfp_url, user_name, provider} = req.user;
-    const token = jwt.sign({id, email, name, pfp_url, user_name, provider}, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({id, email, name, pfp_url, user_name, provider}, process.env.JWT_SECRET, { expiresIn: '11h' });
     // Set the token as a cookie
-    res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'strict', maxAge:9000000 });
+    res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'strict', maxAge:45000000 });
     res.redirect(`${process.env.FRONT_END_DOMAIN}/app/welcome`);
   }
 );

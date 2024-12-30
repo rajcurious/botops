@@ -12,7 +12,7 @@ const get_user_name = (name) => (removeSpaces(name).toLowerCase()+ randomFourDig
 class UserService {
     constructor(userRepository) {
         this.userRepository = userRepository;
-        this.userIdGenerator = new UniqueIDGenerator(process.env.STAGE == 'dev');
+        this.userIdGenerator = new UniqueIDGenerator(process.env.STAGE === 'dev');
     }
 
     async createUserFromGoogleProfile(profile_json) {
@@ -23,7 +23,7 @@ class UserService {
         const exitingUser = getOne(await this.searchUser({email}));
         if(exitingUser) {
             // user already exists no need to create a new usr
-            return exitingUser;
+            return  {isNew: false, user : exitingUser};
         }
         if(!profile_json?.name) {
             throw Error("name is not found, name is must to create a new user")
@@ -51,7 +51,8 @@ class UserService {
         }
         console.log("Creating new user...")
         await this.userRepository.create(user);
-        return getOne(await this.searchUser({id: user_id}));
+        const newUser =  getOne(await this.searchUser({id: user_id}));
+        return  {isNew: true, user : newUser};
     }
 
     async create({ id, email, password = null, name, given_name, family_name, user_name = null, pfp_url = null, about = "", provider, provider_user_id, bot = 0, email_verified}) {

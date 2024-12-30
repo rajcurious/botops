@@ -9,6 +9,15 @@ const users = new Map(); // { userId: socket }
 const chatManager = new ChatManager();
 const connectionManager =  new ConnectionManager()
 
+function addUserToChannel(user_id, channel_id) {
+  const socketChannel = connectionManager.getOrCreateChannel(channel_id);
+  if(users.get(user_id)) {
+   users.get(user_id).forEach((socket)=>{
+     socketChannel.addSocket(socket);
+   })
+  }
+}
+
 function setupSocket(io) {
   io.on('connection', async (socket) =>  {
     const userId = socket.handshake.query.user_id.toString();
@@ -164,13 +173,8 @@ function setupSocket(io) {
    })
 
     socket.on('add-bot', async ({channel_id, bot_id}) => {
-    
-     const socketChannel = connectionManager.getOrCreateChannel(channel_id);
-     if(users.get(bot_id)) {
-      users.get(bot_id).forEach((socket)=>{
-        socketChannel.addSocket(socket);
-      })
-     }
+      
+      addUserToChannel(bot_id, channel_id)
 
       const channel =  (await channelService.getChannelWithIds([channel_id]))[0]
       const subscriptions = await userService.searchChannelSubscription({channel_id})
@@ -279,4 +283,4 @@ function setupSocket(io) {
   });
 }
 
-module.exports = setupSocket;
+module.exports = {setupSocket, addUserToChannel};

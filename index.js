@@ -9,12 +9,14 @@ const cookieParser =  require('cookie-parser')
 const jwt = require('jsonwebtoken');
 const http = require('http');
 const { Server } = require('socket.io');
-const setupSocket = require("./chat-server/socketManager");
+const {setupSocket, addUserToChannel} = require("./chat-server/socketManager");
 const publicRoutes = ['/auth/login', '/auth/register'];
 const passport =  require("passport")
 const GoogleStrategy = require("passport-google-oauth20").Strategy
 const cors =  require('cors');  
-const { userService } = require("./dependencies");
+const { userService, channelService } = require("./dependencies");
+
+const DEFAULT_BOT_ID = 1734111777966; // ID Of cuteuu bot
 
 
 const authenticateJWT = (req, res, next) => {
@@ -29,6 +31,20 @@ const authenticateJWT = (req, res, next) => {
       next();
     });
   };
+
+const setUpNewUser = async (user) =>{
+ 
+  const channel = await channelService.createChannel({
+    admin_id: DEFAULT_BOT_ID,
+    is_group: 0,
+  });
+
+  await userService.subscribeUserToChannel(user.id, channel.id)
+  await userService.subscribeUserToChannel(DEFAULT_BOT_ID, channel.id)
+  addUserToChannel(user.id, channel.id)
+  addUserToChannel(DEFAULT_BOT_ID, channel.id)
+
+}
 
 
 
@@ -60,7 +76,10 @@ passport.use(new GoogleStrategy({
   scope: ['email','profile','openid'],
 },
  async (accessToken, refreshToken, profile, done) =>{
-  const user = await userService.createUserFromGoogleProfile(profile._json)
+  const {isNew, user} = await userService.createUserFromGoogleProfile(profile._json)
+  if(isNew){
+    await setUpNewUser(user)
+  }
   return done(null, user)
 }
 ))
