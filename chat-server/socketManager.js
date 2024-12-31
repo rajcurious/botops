@@ -1,15 +1,14 @@
 
 const { messageService , userService, friendRequestService, channelService, notificationService} = require('../dependencies');
 const { getOne } = require('../utils/helper');
-const ChatManager = require('./ChatManger');
 const ConnectionManager = require('./ConnectionManager');
 
 const users = new Map(); // { userId: socket }
 
-const chatManager = new ChatManager();
 const connectionManager =  new ConnectionManager()
 
 function addUserToChannel(user_id, channel_id) {
+  user_id = user_id.toString()
   const socketChannel = connectionManager.getOrCreateChannel(channel_id);
   if(users.get(user_id)) {
    users.get(user_id).forEach((socket)=>{
@@ -71,18 +70,11 @@ function setupSocket(io) {
       }
     });
 
-    socket.on('join-room', ({ user_id, channel_id }) => {
-      const chatRoom = chatManager.getOrCreateRoom(channel_id);
+    socket.on('join-room', ({channel_id}) => {
+
       const channel = connectionManager.getOrCreateChannel(channel_id)
       channel.addSocket(socket);
-      chatRoom.addUser(user_id);
-      socket.join(channel_id);
-
-      console.log(`User id ${user_id} joing room  : ${channel_id}`)
-
-      // Notify users in the room
-      // chatRoom.broadcast(io, {channel_id, author: 'System', content: `${username} has joined.`, created_at: get_current_timestamp() });
-    //   io.to(room).emit('roomUsers', { room, users: chatRoom.getUsers() });
+      console.log(`socket id ${socket.id} joining the channel id : ${channel_id}`)
     });
 
     socket.on("add-friend", async ({friend_request_id, from_user, to_user}) => {
@@ -211,14 +203,12 @@ function setupSocket(io) {
     socket.on('message', async (message, callback) => {
       try{
         const channel_id = parseInt(message?.channel_id)
-        const chatRoom = chatManager.getOrCreateRoom(channel_id);
         const channel = connectionManager.getOrCreateChannel(channel_id)
         const msg = await messageService.addMessage(message)
         callback({ status: "acknowledged", message_id: msg.id});
         const author = getOne(await userService.searchUser({id : msg.author_id}))
         msg.author = author
         msg.status = 'acknowledged'
-      // chatRoom.broadcast(io, msg);
         channel.broadcastMessage(socket.id, msg);
       }
       catch(err) {
@@ -251,23 +241,6 @@ function setupSocket(io) {
         channel.broadcastReaction(reaction)
     } )
 
-
-
-
-    socket.on('leaveRoom', ({ user_id, room }) => {
-      const chatRoom = chatManager.getOrCreateRoom(room);
-      chatRoom.removeUser(user_id);
-      socket.leave(room);
-
-      chatRoom.broadcast(io, { username: 'System', text: `${username} has left.` });
-      io.to(room).emit('roomUsers', { room, users: chatRoom.getUsers() });
-
-      // Clean up room if empty
-      if (chatRoom.getUsers().length === 0) {
-        chatManager.deleteRoom(room);
-      }
-    });
-
     socket.on('disconnect', () => {
       connectionManager.removeSocket(socket)
       // Find the index of the object to delete
@@ -276,7 +249,7 @@ function setupSocket(io) {
       // Delete the element if found
       if (index !== -1) {
         users.get(userId).splice(index, 1);
-}
+      }
       console.log('User disconnected with id', userId);
       // Handle cleanup if needed
     });

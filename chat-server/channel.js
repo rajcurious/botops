@@ -23,9 +23,6 @@ class Channel {
       if(except_sender) {
         console.log(this.sockets.keys())
         this.sockets.forEach((socket, socket_id) => {
-          console.log('==============================================')
-          console.log(`Emitting to socket with id = ${socket_id}`)
-          console.log('==============================================')
           if(socket_id !== sender_socket_id) {
             socket.emit('message', message);
           }
@@ -35,9 +32,6 @@ class Channel {
       }
       else{
         this.sockets.forEach((socket, socket_id) => {
-          console.log('==============================================')
-          console.log(`Emitting to socket with id = ${socket_id}`)
-          console.log('==============================================')
           socket.emit('message', message);
         });
       }
