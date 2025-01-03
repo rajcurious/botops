@@ -20,7 +20,7 @@ class UserService {
             throw Error("Email id not found, email id is must to create anew user")
         } 
         const email = profile_json.email
-        const exitingUser = getOne(await this.searchUser({email}));
+        const exitingUser = getOne(await this.searchUser({email, is_deleted: 0}));
         if(exitingUser) {
             // user already exists no need to create a new usr
             return  {isNew: false, user : exitingUser};
@@ -29,10 +29,10 @@ class UserService {
             throw Error("name is not found, name is must to create a new user")
         }
         let user_name = get_user_name(profile_json?.name)
-        let is_old_user = getOne(this.searchUser({user_name}));
+        let is_old_user = getOne(this.searchUser({user_name, is_deleted : 0}));
         while(is_old_user) {
             user_name = get_user_name(profile_json?.name)
-            is_old_user = getOne(this.searchUser({user_name}));
+            is_old_user = getOne(this.searchUser({user_name, is_deleted : 0}));
         }
 
         const user_id = this.userIdGenerator.generateID().toString();
@@ -51,7 +51,7 @@ class UserService {
         }
         console.log("Creating new user...")
         await this.userRepository.create(user);
-        const newUser =  getOne(await this.searchUser({id: user_id}));
+        const newUser =  getOne(await this.searchUser({id: user_id, is_deleted : 0}));
         return  {isNew: true, user : newUser};
     }
 
@@ -66,10 +66,10 @@ class UserService {
     async createBot(user) {
 
         let user_name = get_user_name(user?.name)
-        let is_old_user = getOne(await this.searchUser({user_name}));
+        let is_old_user = getOne(await this.searchUser({user_name, is_deleted : 0}));
         while(is_old_user) {
             user_name = get_user_name(user?.name)
-            is_old_user = getOne(await this.searchUser({user_name}));
+            is_old_user = getOne(await this.searchUser({user_name, is_deleted : 0}));
         }
         const user_id = this.userIdGenerator.generateID().toString();
         user.id = user_id;

@@ -37,15 +37,13 @@ const startUpData =  async (req, res) => {
     //Assumption: for message in there channel must exist...
     lastMessages.forEach(lastMessage => channelInfo[lastMessage.channel_id]['lastMesssage'] =  lastMessage)
 
-    const bots =  await userService.searchUser({bot: 1})
+    const bots =  await userService.searchUser({bot: 1, is_deleted : 0})
     response = {
         user : user,
         channels:  Object.values(channelInfo) || [],
         friendRequests:  friendRequests || [],
         bots: bots || []
     }
-    // // TASK TO FETCH pfp of all channel users...
-    // const response = await userService.searchUser(req.query)
 
     res.status(200).send(response)
 

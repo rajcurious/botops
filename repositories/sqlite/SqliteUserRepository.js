@@ -149,7 +149,7 @@ class SqliteUserRepository  {
     }
     
     async getFriends(user_id) {
-        const query  =  "select * from user where id in (select user_id from channel_subscription where channel_id in (select channel_id from channel_subscription join channels where user_id = ? and is_group = 0) and user_id != ?)"
+        const query  =  "select * from user where id in (select user_id from channel_subscription where channel_id in (select channel_id from channel_subscription join channels where user_id = ? and is_group = 0) and user_id != ?) and bot = 0"
         return allQuery(this.db, query, [user_id, user_id])
     }
 

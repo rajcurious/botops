@@ -29,8 +29,8 @@ function setupSocket(io) {
     users.get(userId).push(socket);
     console.log('User connected with user_id:', userId, "and socket id: ", socket.id);
     
-    // If user is bot already join this bot to the channels so..
-    const user = getOne(await userService.searchUser({id: userId}))
+    // If user is bot already join this bot to the channels
+    const user = getOne(await userService.searchUser({id: userId, is_deleted : 0}))
     if(!user){
       console.log(`user with id ${userId} is not present`)
       return
@@ -59,7 +59,7 @@ function setupSocket(io) {
       console.log('User connected with user_id:', userId, "and socket id: ", socket.id);
       
       // If user is bot already join this bot to the channels so..
-      const user = getOne(await userService.searchUser({id: userId}))
+      const user = getOne(await userService.searchUser({id: userId, is_deleted : 0}))
       if(user.bot){
          const channelSubsriptions =  await userService.getChannelsSubscribedBy(BigInt(userId))
          channelSubsriptions.forEach((subscription) => {
@@ -79,11 +79,11 @@ function setupSocket(io) {
 
     socket.on("add-friend", async ({friend_request_id, from_user, to_user}) => {
        const to_user_id = to_user.id.toString()
-      
+       const friendRequest = getOne(await friendRequestService.searchFriendRequest({ id: friend_request_id }));
         if(users.get(to_user_id)) {
           users.get(to_user_id).forEach( target_socket =>  {
             console.log(`Sending friend request with id = ${friend_request_id} to socket with id = `, target_socket.id )
-            target_socket.emit('friend-request', {id: friend_request_id, sender : from_user })
+            target_socket.emit('friend-request', {...friendRequest, sender : from_user })
           })
         }
     })
@@ -92,28 +92,29 @@ function setupSocket(io) {
       
       if(status === 'ACCEPTED') {
           const {friend_request_id, channel_id, notification_id} = payload
-          const friendRequest = (await friendRequestService.searchFriendRequest({ id: friend_request_id }))[0];
-          const channel =(await channelService.getChannelWithIds([channel_id]))[0]
+          const friendRequest = getOne(await friendRequestService.searchFriendRequest({ id: friend_request_id }));
+          const channel = getOne(await channelService.getChannelWithIds([channel_id]))
           const subscriptions = await userService.searchChannelSubscription({channel_id: channel.id})
           const user_ids =  subscriptions.map((sub)=>sub.user_id)
           const channel_users_list = await userService.getUserByIds(user_ids)
-          // should replace with is_group
-          if(!channel.pfp_url) {
-              const friend =  (channel_users_list.filter((channel_user)=> channel_user.id !=user.id))[0]
-              channelInfo[channel.id].name = friend.name
-              channelInfo[channel.id].pfp_url = friend.pfp_url
-          }
+
           channel.users = channel_users_list
           const notification  = (await notificationService.searchNotification({id : notification_id}))[0]
           const sender_id = friendRequest.sender_id.toString()
           const receiver_id = friendRequest.receiver_id.toString()
           if(users.get(sender_id)) {
+              const friend =  (channel_users_list.filter((channel_user)=> channel_user.id !== friendRequest.sender_id))[0]
+              channel.name = friend.name
+              channel.pfp_url = friend.pfp_url
               users.get(sender_id).forEach( target_socket =>  {
                 console.log(`Sending channel update with id = ${channel.id} to socket with id = `, target_socket.id )
                 target_socket.emit('add-channel', channel)
               })
           }
           if(users.get(receiver_id)) {
+            const friend =  (channel_users_list.filter((channel_user)=> channel_user.id !== friendRequest.receiver_id))[0]
+            channel.name = friend.name
+            channel.pfp_url = friend.pfp_url
             users.get(receiver_id).forEach( target_socket =>  {
               console.log(`Sending channel update with id = ${channel.id} to socket with id = `, target_socket.id )
               target_socket.emit('add-channel', channel)
@@ -129,14 +130,9 @@ function setupSocket(io) {
       
       }
       
-      if(status === 'DECLINED')
-       
-       if(users.get(to_user_id)) {
-         users.get(to_user_id).forEach( target_socket =>  {
-           console.log(`Sending friend request with id = ${friend_request_id} to socket with id = `, target_socket.id )
-           target_socket.emit('friend-request', {friend_request_id, from_user})
-         })
-       }
+      if(status === 'DECLINED') {
+        //TODO: for a while do nothing...
+      }
 
    })
 
@@ -190,7 +186,7 @@ function setupSocket(io) {
        const target_user_name = notification?.target_user_name
        // TODO: logic to store notification using notification sevice...
        const toSocket = users.get(target_user_id); // Get the recipient's socket
-       const from_user = getOne(userService.searchUser({userId}))
+       const from_user = getOne(userService.searchUser({userId, is_deleted : 0}))
       //  if(!fr)
        if (toSocket) {
         // Notify the recipient of the invite

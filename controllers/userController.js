@@ -60,7 +60,7 @@ const createBot =  async (req, res) => {
 
 const getBots =  async (req, res) => {
 
-    const response = await userService.searchUser({bot : 1})
+    const response = await userService.searchUser({bot : 1, is_deleted : 0})
     return res.status(200).send(response);
 }
 

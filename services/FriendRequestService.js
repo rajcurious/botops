@@ -9,17 +9,24 @@ class FriendRequestService {
 
     async createFriendRequest({receiver_id, sender_id}) {
         
-        const friend_request_id  = this.friendRequestIdGenerator.generateID().toString();
+       
         if(!receiver_id) {
             throw Error("Field receiver_id is missing, receiver_id  is must to create a friend request") 
         } 
         if(!sender_id) {
             throw Error("Field sender_id is missing, sender_id  is must to create a friend request") 
         }
-        await this.friendRequestRepository.create({id: friend_request_id, receiver_id, sender_id});
-        return {
-            id: friend_request_id
+        const friendRequest = getOne(await this.searchFriendRequest({ receiver_id , sender_id }));
+        if(!friendRequest) {
+            const friend_request_id  = this.friendRequestIdGenerator.generateID().toString();
+            return {
+                id: friend_request_id
+            }
         }
+        return {
+            id: friendRequest.id
+        }
+       
     }
 
     async searchFriendRequest({id, receiver_id, sender_id, status}) {

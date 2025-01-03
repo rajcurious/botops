@@ -15,9 +15,8 @@ const createFriendRequest = async (req, res) => {
 
 const updateFriendRequest = async (req, res) => {
   const { id} = req.body;
-  console.log("updateFriendRequest", req.body)
  
-  const friendRequest = (await friendRequestService.searchFriendRequest({ id }))[0];
+  const friendRequest = getOne(await friendRequestService.searchFriendRequest({ id }));
   const sender = getOne(await userService.searchUser({id: friendRequest.sender_id}))
   if(!friendRequest){
     return null;
