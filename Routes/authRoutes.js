@@ -16,7 +16,6 @@ Router.get(
   }),
   (req, res) => {
     // Generate JWT token
-    console.log("we reacher here...")
     const {id, email, name, pfp_url, user_name, provider} = req.user;
     const token = jwt.sign({id, email, name, pfp_url, user_name, provider}, process.env.JWT_SECRET, { expiresIn: '11h' });
     // Set the token as a cookie

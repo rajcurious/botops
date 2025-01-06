@@ -5,11 +5,10 @@ class Channel {
     }
   
     addSocket(socket) {
-      console.log('==============================================')
-      console.log(`socket with id =  ${socket.id} has joined the channel ${this.channel_id}`)
-      console.log('==============================================')
-      this.sockets.set(socket.id, socket)
-      this.sockets.forEach((value, key)=>console.log(key))
+      if(!this.sockets.has(socket.id)) {
+        this.sockets.set(socket.id, socket)
+      }
+       
     }
   
     removeSocket(socket_id) {
