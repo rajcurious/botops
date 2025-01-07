@@ -21,6 +21,7 @@ class FriendRequestService {
         const friendRequest = getOne(await this.searchFriendRequest({ receiver_id , sender_id }));
         if(!friendRequest) {
             const friend_request_id  = this.friendRequestIdGenerator.generateID().toString();
+            await this.friendRequestRepository.create({id : friend_request_id, receiver_id, sender_id});
             return {
                 id: friend_request_id
             }
