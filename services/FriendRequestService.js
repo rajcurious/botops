@@ -1,6 +1,6 @@
 
 const UniqueIDGenerator = require("../utils/uniqueIdentity");
-
+const {getOne} =  require("../utils/helper")
 class FriendRequestService {
     constructor(friendRequestRepository) {
         this.friendRequestRepository = friendRequestRepository;
@@ -16,6 +16,8 @@ class FriendRequestService {
         if(!sender_id) {
             throw Error("Field sender_id is missing, sender_id  is must to create a friend request") 
         }
+
+
         const friendRequest = getOne(await this.searchFriendRequest({ receiver_id , sender_id }));
         if(!friendRequest) {
             const friend_request_id  = this.friendRequestIdGenerator.generateID().toString();
