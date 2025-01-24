@@ -1,3 +1,4 @@
+const { getOne } = require('../../utils/helper');
 const { runQuery, allQuery } = require('./helper');
 
 const sqlite3 = require('sqlite3').verbose();
@@ -60,6 +61,19 @@ class SqliteUserRepository  {
                         },
                     );
                     this.db.run(
+                        `CREATE TABLE IF NOT EXISTS auth_tokens (
+                            id INTEGER PRIMARY KEY,
+                            access_token TEXT,
+                            refresh_token TEXT,
+                            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                            edited_at DATETIME
+                        );`,
+                        (err) => {
+                            if (err) reject(err.message);
+                            else resolve();
+                        },
+                    );
+                    this.db.run(
                         `CREATE INDEX IF NOT EXISTS channel_subscription_user_id_idx ON channel_subscription(user_id)`
                     ,(err) => {
                         if (err) reject(err.message);
@@ -94,8 +108,6 @@ class SqliteUserRepository  {
 
         return runQuery(this.db, query, [...values, id]);
     }
-
-
 
     async searchChannelSubscription(searchFields) {
         const fields = Object.keys(searchFields);
@@ -168,7 +180,39 @@ class SqliteUserRepository  {
 
     async getAll(){
         return allQuery(this.db, "select * from messages");
-     }
+    }
+
+    // AUTH TOKENS
+
+
+
+    async createAuthTokens(user_id, access_token, refresh_token) {
+        const query = `
+            INSERT INTO auth_tokens (id, access_token, refresh_token) VALUES (?, ?, ?);
+        `;
+
+        return runQuery(this.db, query, [user_id, access_token, refresh_token]);
+    }
+
+    async getAuthTokens(user_id) {
+        return getOne(await allQuery(this.db, "select * from auth_tokens where id =  ?", [user_id]));
+    }
+
+    async updateAuthTokens(user_id, tokens) {
+
+        const fields = Object.keys(tokens);
+        const values = Object.values(tokens);
+
+        const setClause = fields.map((field) => `${field} = ?`).join(', ');
+        const query = `
+            UPDATE auth_tokens
+            SET ${setClause}, edited_at = CURRENT_TIMESTAMP
+            WHERE id = ?;
+        `;
+
+        return runQuery(this.db, query, [...values, user_id]);
+    }
+
 }
 
 module.exports =  SqliteUserRepository;

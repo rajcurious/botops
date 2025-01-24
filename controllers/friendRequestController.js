@@ -19,6 +19,7 @@ const updateFriendRequest = async (req, res) => {
   const friendRequest = getOne(await friendRequestService.searchFriendRequest({ id }));
   const sender = getOne(await userService.searchUser({id: friendRequest.sender_id}))
   if(!friendRequest){
+    res.send(null)
     return null;
   }
   if (friendRequest.status === "ACCEPTED") {

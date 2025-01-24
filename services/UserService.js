@@ -131,6 +131,30 @@ class UserService {
         return await this.userRepository.getFriends(user_id);
     }
 
+    async getAuthTokens(user_id) {
+        return await this.userRepository.getAuthTokens(user_id);
+
+    }
+
+
+    // TODO : this looks bad, null params should be ignored at repo level, and not at service level...
+    async upsertAuthTokens(user_id,  {access_token, refresh_token}) {
+        console.log("user_id ", user_id, " access_token " , access_token, " refresh_token ",  refresh_token)
+        const tokens =  await this.getAuthTokens(user_id);
+        if(!tokens) {
+            return await this.userRepository.createAuthTokens(user_id, access_token, refresh_token);
+        }
+        if(access_token && refresh_token) {
+            return await  this.userRepository.updateAuthTokens(user_id, {access_token, refresh_token});
+        }
+        if(access_token) {
+            return await  this.userRepository.updateAuthTokens(user_id, {access_token});
+        }
+        if(refresh_token) {
+            return await  this.userRepository.updateAuthTokens(user_id, {refresh_token});
+        }   
+    }
+
 
 }
 

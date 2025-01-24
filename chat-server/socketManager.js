@@ -9,6 +9,7 @@ const connectionManager =  new ConnectionManager()
 
 function addUserToChannel(user_id, channel_id) {
   user_id = user_id.toString()
+  channel_id = parseInt(channel_id)
   const socketChannel = connectionManager.getOrCreateChannel(channel_id);
   if(users.get(user_id)) {
    users.get(user_id).forEach((socket)=>{
