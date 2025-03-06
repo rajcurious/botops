@@ -44,6 +44,7 @@ const authenticateJWT = (req, res, next) => {
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
       if (err) return res.status(403).json({ message: 'Forbidden' });
       req.user = user; // Attach user to the request object
+      //TODO: handle user access control here for anonmous user...
       next();
     });
   };
@@ -61,7 +62,6 @@ const setUpNewUser = async (user) =>{
   addUserToChannel(DEFAULT_BOT_ID, channel.id)
 
 }
-
 
 
 const app  = express();

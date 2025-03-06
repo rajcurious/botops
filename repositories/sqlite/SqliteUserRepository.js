@@ -124,7 +124,7 @@ class SqliteUserRepository  {
         return allQuery(this.db, query, values);
     }
   
-    async create({ id, email, password = null, name, given_name, family_name, user_name = null, pfp_url = null, about = "", provider, provider_user_id, bot = 0, email_verified}) {
+    async create({ id, email = null, password = null, name, given_name, family_name, user_name = null, pfp_url = null, about = "", provider, provider_user_id, bot = 0, email_verified}) {
         const query = `
             INSERT INTO user (id, email, password, name, given_name, family_name, user_name, pfp_url, about, provider, provider_user_id, bot,  email_verified)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);

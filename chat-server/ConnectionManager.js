@@ -10,6 +10,7 @@ class ConnectionManager {
         console.log("using the same instance to broadcast...",  channel_id)
         this.channels.set(channel_id, new Channel(channel_id));
       }
+
       return this.channels.get(channel_id);
     }
   

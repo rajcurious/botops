@@ -2,10 +2,12 @@
 const { messageService , userService, friendRequestService, channelService, notificationService} = require('../dependencies');
 const { getOne } = require('../utils/helper');
 const ConnectionManager = require('./ConnectionManager');
+const StrangerQueueManger =  require('./StrangerQueueManger')
 
 const users = new Map(); // { userId: socket }
 
 const connectionManager =  new ConnectionManager()
+const strangerQueueManger = new StrangerQueueManger()
 
 function addUserToChannel(user_id, channel_id) {
   user_id = user_id.toString()
@@ -71,8 +73,49 @@ function setupSocket(io) {
       }
     });
 
+    socket.on('strangerQueue:join', (user) => {
+      console.log('strangerQueue:join', user);
+      strangerQueueManger.joinQueue(user, socket);
+    })
+    socket.on('transient:channel:get', async (callback) => {
+      const channel = await strangerQueueManger.getChannel(userId);
+      console.log("Channel ", channel);
+      callback(channel);
+    })
+    socket.on('transient:channel:skip', async (channel_id) => {
+      await strangerQueueManger.skipChannel(channel_id, userId);
+      console.log("Skipping channel with id =", channel_id);
+      connectionManager.deleteChannel(channel_id);
+    })
+    
+    socket.on('user:call', ({from, channel_id, offer}) => {
+      console.log("user:call", {from, channel_id, offer})
+      const channel = connectionManager.getOrCreateChannel(channel_id);
+      channel.call(from, offer, socket.id);
+    });
+    socket.on('call:accepted', ({by, channel_id, ans}) => {
+      console.log("call:accepted", {by, channel_id, ans})
+      const channel = connectionManager.getOrCreateChannel(channel_id);
+      channel.callAccepted(by, ans, socket.id)
+    });
+    socket.on("peer:nego:needed", ({ channel_id, offer }) => {
+      console.log("peer:nego:needed", { channel_id, offer })
+      const channel = connectionManager.getOrCreateChannel(channel_id);
+      channel.requestPeerNegotiation( offer, socket.id);
+      
+    });
+    socket.on("peer:nego:done", ({ channel_id, ans }) => {
+      console.log("peer:nego:done", { channel_id, ans })
+      const channel = connectionManager.getOrCreateChannel(channel_id);
+      channel.peerNegotiationDone(ans, socket.id);
+    });
+
+
     socket.on('join-room', ({channel_id}) => {
 
+      if(!channel_id){
+        return;
+      }
       const channel = connectionManager.getOrCreateChannel(channel_id)
       channel.addSocket(socket);
       console.log(`socket id ${socket.id} joining the channel id : ${channel_id}`)
@@ -203,9 +246,13 @@ function setupSocket(io) {
         const channel = connectionManager.getOrCreateChannel(channel_id)
         const msg = await messageService.addMessage(message)
         callback({ status: "acknowledged", message_id: msg.id});
-        const author = getOne(await userService.searchUser({id : msg.author_id}))
+        let author = message.author;
+        if(!author){
+          author = getOne(await userService.searchUser({id : msg.author_id}))
+        }
         msg.author = author
         msg.status = 'acknowledged'
+        console.log("BroadCasting message...", msg);
         channel.broadcastMessage(socket.id, msg);
       }
       catch(err) {

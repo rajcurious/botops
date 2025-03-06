@@ -21,6 +21,13 @@ class ChannelService {
         return  {id : channel_id}
     }
 
+    async createAnonymousChannel() {
+        const channel_id  = this.channelIdGenerator.generateID().toString();
+        await this.channelRepository.create(channel_id, {});
+        return  {id : channel_id}
+    }
+
+
     async getChannelWithIds(channel_ids = []) {
         console.log("getChannelWithIds", channel_ids)
 

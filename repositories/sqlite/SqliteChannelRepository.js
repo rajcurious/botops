@@ -30,7 +30,8 @@ class SqliteChannelRepository  {
                             edited_at DATETIME ,
                             bot INTEGER DEFAULT 0 ,
                             is_group INTEGER DEFAULT 0,
-                            is_deleted INTEGER DEFAULT 0
+                            is_deleted INTEGER DEFAULT 0,
+                            is_transient INTEGER DEFAULT 0
                         );`,
                         (err) => {
                             if (err) reject(err.message);
@@ -42,12 +43,12 @@ class SqliteChannelRepository  {
         });
     }
 
-    async create(id, is_group, {name = "", admin_id = null, age_restricted, about = "", bot = 0, pfp_url = null}){
+    async create(id, {is_group = 0, name = "", admin_id = null, age_restricted, about = "", bot = 0, pfp_url = null, is_transient = 0}){
         const query = `
-        INSERT INTO channels (id, name, admin_id, pfp_url,  is_group, age_restricted, about, bot )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+        INSERT INTO channels (id, name, admin_id, pfp_url,  is_group, age_restricted, about, bot, is_transient)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
-        return runQuery(this.db, query, [id, name, admin_id, pfp_url, is_group,  age_restricted, about, bot]);
+        return runQuery(this.db, query, [id, name, admin_id, pfp_url, is_group,  age_restricted, about, bot, is_transient]);
     }
 
     async findByIds(channel_ids = []) {

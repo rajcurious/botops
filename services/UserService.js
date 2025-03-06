@@ -2,9 +2,41 @@
 // Service using UserRepository
 const UniqueIDGenerator = require("../utils/uniqueIdentity");
 const { getOne } = require("../utils/helper");
-
+function randomChoice(array) {
+    return array[Math.floor(Math.random() * array.length)];
+}
+  
+function randomNumber(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 const randomFourDigit = () => Math.floor(Math.random() * 9999);
 const removeSpaces = (str) => str.replace(/\s+/g, '');
+const adjectives = [
+    "Cool", "Fast", "Silent", "Mysterious", "Shadow",
+    "Invisible", "Swift", "Fierce", "Brave", "Clever"
+  ];
+  
+  const nouns = [
+    "Tiger", "Ninja", "Wolf", "Ghost", "Eagle",
+    "Panther", "Hawk", "Fox", "Dragon", "Raven"
+  ];
+
+const getAnonymousUserDetails = (username) => {
+    const given_name = randomChoice(nouns);
+    const family_name = randomChoice(adjectives);
+    if(username) {
+        return {
+              user_name : `${username}${randomNumber(1000, 9999)}`,
+              name :  username
+        }
+    }
+    return {
+        given_name, 
+        family_name,
+        user_name : `${family_name}${given_name}${randomNumber(1000, 9999)}`,
+        name :  `${family_name} ${given_name}`
+    }
+}
 
 const get_user_name = (name) => (removeSpaces(name).toLowerCase()+ randomFourDigit())
 
@@ -22,7 +54,8 @@ class UserService {
         const email = profile_json.email
         const exitingUser = getOne(await this.searchUser({email, is_deleted: 0}));
         if(exitingUser) {
-            // user already exists no need to create a new usr
+            //TODO: handle the case where deleted user want to make new account
+            // user already exists no need to create a new user
             return  {isNew: false, user : exitingUser};
         }
         if(!profile_json?.name) {
@@ -50,6 +83,29 @@ class UserService {
             provider_user_id : profile_json?.sub
         }
         console.log("Creating new user...")
+        await this.userRepository.create(user);
+        const newUser =  getOne(await this.searchUser({id: user_id, is_deleted : 0}));
+        return  {isNew: true, user : newUser};
+    }
+    async getOrCreateAnonymousUser(existing_user_id, username) {
+        if(existing_user_id && existing_user_id != "") {
+            const existingUser =  getOne(await this.searchUser({id: existing_user_id, is_deleted : 0}));
+            if(existingUser) {
+                return {isNew: false, user: existingUser};
+            }
+        }
+        const details = getAnonymousUserDetails(username);
+        const user_id = this.userIdGenerator.generateID().toString();
+        const user = {
+            id : user_id,
+            user_name : details.user_name,
+            email_verified : 0,
+            name: details?.name,
+            given_name : details?.given_name,
+            family_name : details?.family_name,
+            provider: 'anonymous'
+        }
+        console.log("Creating new user... with user_name = ",  details.user_name)
         await this.userRepository.create(user);
         const newUser =  getOne(await this.searchUser({id: user_id, is_deleted : 0}));
         return  {isNew: true, user : newUser};
