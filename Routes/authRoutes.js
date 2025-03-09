@@ -22,7 +22,8 @@ Router.get("/anonymous/signin", async (req, res) => {
 
     const data = await response.json();
     console.log(data);
-    const {isNew, user} = await userService.getOrCreateAnonymousUser(user_id, username);
+    const pfpUrl = `https://api.dicebear.com/9.x/thumbs/svg?seed=${username}`
+    const {isNew, user} = await userService.getOrCreateAnonymousUser(user_id, username, pfpUrl);
     // TODO: IMP, do sth for new user login, like redirect to some introduction url rather than /chat/new
     const { id, email, name, pfp_url, user_name, provider } = user;
     const jwtToken = jwt.sign(

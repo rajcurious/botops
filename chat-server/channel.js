@@ -71,6 +71,16 @@ class Channel {
     });
   }
 
+  callRejected(by, sender_socket_id) {
+    this.sockets.forEach((socket, socket_id) => {
+      if (socket_id !== sender_socket_id) {
+        socket.emit("call:rejected", { channel_id: this.channel_id, by });
+        // TODO: think of multi-user call now only 1-1 call i supported. so returning
+        return;
+      }
+    });
+  }
+
   requestPeerNegotiation( offer, sender_socket_id) {
     this.sockets.forEach((socket, socket_id) => {
       if (socket_id !== sender_socket_id) {
@@ -89,6 +99,29 @@ class Channel {
       }
     });
   }
+
+  onStartTyping(by, sender_socket_id) {
+    this.sockets.forEach((socket, socket_id) => {
+      if (socket_id !== sender_socket_id) {
+        socket.emit("typing:started", { channel_id: this.channel_id, by });
+        // TODO: think of multi-user call now only 1-1 call i supported. so returning
+        return;
+      }
+    });
+  }
+
+  onStopTyping(by, sender_socket_id) {
+    this.sockets.forEach((socket, socket_id) => {
+      if (socket_id !== sender_socket_id) {
+        socket.emit("typing:stopped", { channel_id: this.channel_id, by });
+        // TODO: think of multi-user call now only 1-1 call i supported. so returning
+        return;
+      }
+    });
+  }
+
+
+
 
   existsSocketId(socket_id) {
     return this.sockets.has(socket_id);

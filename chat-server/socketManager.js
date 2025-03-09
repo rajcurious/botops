@@ -98,6 +98,13 @@ function setupSocket(io) {
       const channel = connectionManager.getOrCreateChannel(channel_id);
       channel.callAccepted(by, ans, socket.id)
     });
+
+    // Handles both call cut and call rejected...
+    socket.on('call:rejected', ({by, channel_id}) => {
+      console.log("call:rejected", {by, channel_id})
+      const channel = connectionManager.getOrCreateChannel(channel_id);
+      channel.callRejected(by, socket.id)
+    });
     socket.on("peer:nego:needed", ({ channel_id, offer }) => {
       console.log("peer:nego:needed", { channel_id, offer })
       const channel = connectionManager.getOrCreateChannel(channel_id);
@@ -108,6 +115,17 @@ function setupSocket(io) {
       console.log("peer:nego:done", { channel_id, ans })
       const channel = connectionManager.getOrCreateChannel(channel_id);
       channel.peerNegotiationDone(ans, socket.id);
+    });
+
+    socket.on('typing:started', ({by, channel_id}) => {
+      console.log("typing:started", {by, channel_id})
+      const channel = connectionManager.getOrCreateChannel(channel_id);
+      channel.onStartTyping(by, socket.id);
+    });
+    socket.on("typing:stopped", ({by, channel_id}) => {
+      console.log("typing:stopped", {by, channel_id})
+      const channel = connectionManager.getOrCreateChannel(channel_id);
+      channel.onStopTyping(by, socket.id);
     });
 
 

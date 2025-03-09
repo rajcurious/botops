@@ -87,7 +87,7 @@ class UserService {
         const newUser =  getOne(await this.searchUser({id: user_id, is_deleted : 0}));
         return  {isNew: true, user : newUser};
     }
-    async getOrCreateAnonymousUser(existing_user_id, username) {
+    async getOrCreateAnonymousUser(existing_user_id, username, pfp_url = "") {
         if(existing_user_id && existing_user_id != "") {
             const existingUser =  getOne(await this.searchUser({id: existing_user_id, is_deleted : 0}));
             if(existingUser) {
@@ -103,6 +103,7 @@ class UserService {
             name: details?.name,
             given_name : details?.given_name,
             family_name : details?.family_name,
+            pfp_url,
             provider: 'anonymous'
         }
         console.log("Creating new user... with user_name = ",  details.user_name)
